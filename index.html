@@ -1,0 +1,140 @@
+<!DOCTYPE html>
+<html lang="id">
+<meta charset="UTF-8">
+<title>Fireworks Happy New Year 2026</title>
+<style>
+    body {
+        margin: 0;
+        overflow: hidden;
+        background: black;
+    }
+    canvas {
+        display: block;
+    }
+</style>
+</head>
+<body>
+
+<canvas id="canvas"></canvas>
+
+<script>
+const canvas = document.getElementById("canvas");
+const ctx = canvas.getContext("2d");
+
+canvas.width = window.innerWidth;
+canvas.height = window.innerHeight;
+
+const fireworks = [];
+const particles = [];
+
+/* ================= FIREWORK ================= */
+class Firework {
+    constructor() {
+        this.x = Math.random() * canvas.width;
+        this.y = canvas.height;
+        this.targetY = Math.random() * canvas.height / 2;
+        this.speed = 5;
+    }
+
+    update() {
+        this.y -= this.speed;
+        if (this.y <= this.targetY) {
+            explode(this.x, this.y);
+            return false;
+        }
+        return true;
+    }
+
+    draw() {
+        ctx.fillStyle = "white";
+        ctx.fillRect(this.x, this.y, 2, 10);
+    }
+}
+
+/* ================= PARTICLE ================= */
+class Particle {
+    constructor(x, y) {
+        this.x = x;
+        this.y = y;
+        this.radius = 2;
+        this.color = `hsl(${Math.random() * 360},100%,50%)`;
+        this.speedX = (Math.random() - 0.5) * 6;
+        this.speedY = (Math.random() - 0.5) * 6;
+        this.life = 60;
+    }
+
+    update() {
+        this.x += this.speedX;
+        this.y += this.speedY;
+        this.life--;
+    }
+
+    draw() {
+        ctx.beginPath();
+        ctx.arc(this.x, this.y, this.radius, 0, Math.PI * 2);
+        ctx.fillStyle = this.color;
+        ctx.fill();
+    }
+}
+
+function explode(x, y) {
+    for (let i = 0; i < 50; i++) {
+        particles.push(new Particle(x, y));
+    }
+}
+
+/* ================= TEXT ================= */
+function drawText() {
+    ctx.save();
+    ctx.font = "bold 64px Arial";
+    ctx.textAlign = "center";
+    ctx.textBaseline = "middle";
+    ctx.shadowColor = "gold";
+    ctx.shadowBlur = 20;
+    ctx.fillStyle = "gold";
+
+    ctx.fillText(
+        "HAPPY NEW YEAR 2026",
+        canvas.width / 2,
+        canvas.height / 2
+    );
+    ctx.restore();
+}
+
+/* ================= ANIMATION ================= */
+function animate() {
+    ctx.fillStyle = "rgba(0,0,0,0.25)";
+    ctx.fillRect(0, 0, canvas.width, canvas.height);
+
+    if (Math.random() < 0.05) {
+        fireworks.push(new Firework());
+    }
+
+    fireworks.forEach((fw, i) => {
+        if (!fw.update()) fireworks.splice(i, 1);
+        fw.draw();
+    });
+
+    particles.forEach((p, i) => {
+        p.update();
+        p.draw();
+        if (p.life <= 0) particles.splice(i, 1);
+    });
+
+    // teks selalu muncul
+    drawText();
+
+    requestAnimationFrame(animate);
+}
+
+animate();
+
+/* resize support */
+window.addEventListener("resize", () => {
+    canvas.width = window.innerWidth;
+    canvas.height = window.innerHeight;
+});
+</script>
+
+</body>
+</html>
